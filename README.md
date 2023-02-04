@@ -3,7 +3,7 @@
 
 ## A simple tool for OpenVPN CA
 
-Generates CA, server secrets and ovpn client configs for OpenVPN in TLS mode.
+`ovpn-ca.zsh` generates CA, server secrets and ovpn client configs for OpenVPN in TLS mode.
 A pretty simple tool.
 
 
