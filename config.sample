@@ -1,0 +1,16 @@
+#
+
+#server=<server>
+
+#key='ed448'
+#key='ed25519'
+#key='rsa:4096'
+
+#mail='root@local'
+#subj='/C=Country/ST=State/O=Organization/CN=${cn}/emailAddress=${mail}'
+
+#withoutTLSCrypt=yes
+
+#y=1
+#caYears=10
+#serverYears=10
