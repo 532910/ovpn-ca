@@ -26,10 +26,11 @@ Put `_vpn_ca-cert.pem` and `-(cert|key|tlscrypt-key).pem` onto the server
 and give `client@vpn_name.ovpn` to the client.
 
 
-## Required Debian packages
+## Dependencies
 
-`zsh openssl openvpn pwgen tree`
-`pwgen` can be replaced with a similar tool, but others are hardcoded
+`zsh openssl openvpn pwgen grep tree`
+`openvpn` is used for `tls-crypt` only and isn't required when `withoutTLSCrypt=yes`
+`pwgen` can be replaced with a similar tool
 
 
 ## Some options
@@ -62,3 +63,28 @@ subj='/C=Country/ST=State/O=Organization/CN=${cn}/emailAddress=${mail}'
 
 `ovpn-ca.zsh` sources `config` file from the current directory
 and from the server's directory. Any options can be specified there.
+
+
+## Expiration
+
+To list all certs expiration date and days left:
+```
+s=<server> serShowAllCertsExpiration
+```
+
+
+## Revocation
+
+Just create a file named as a client's serial number to revoke,
+in <crls> directory configured as `crl-verify <crls> dir` on the OpenVPN server.
+The file's content doesn't matter, though client's name is convenient.
+
+Get client's certificate serial number:
+```
+s=<server> c=<client> ovpn-ca.zsh ShowClientSerial
+```
+
+One-liner:
+```
+(export c=<client> s=<server>; ssh <vpn_server> "echo $c > /etc/openvpn/server/crls/$(ovpn-ca.zsh ShowClientSerial)")
+```

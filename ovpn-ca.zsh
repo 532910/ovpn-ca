@@ -32,7 +32,6 @@ file=(
 	'server_cert'      "${server}/${server}/${server}-cert.pem"
 	'tls_crypt'        "${server}/${server}/${server}-tlscrypt-key.pem"
 	'config_template'  "${server}/${type:+${type}_}client_template.ovpn"
-#	'config_template'  "${server}/${(j:_:)${=${:-$type client_template.ovpn}}}"
 	'client_csr'       "${server}/${client}/${client}-csr.pem"
 	'client_key'       "${server}/${client}/${client}-key.pem"
 	'client_cert'      "${server}/${client}/${client}-cert.pem"
@@ -41,16 +40,16 @@ file=(
 
 function Subj
 {
-	cn=$1
+	local cn=$1
 	print ${(e)subj}
 }
 
-# returns true number of days in years
+# returns true number of days in $1 years
 function Days
 {
-	years=$1
+	local years=$1
 	strftime -s now %s
-	strftime -s years -r '%Y-%m-%d %T' "$(( $(strftime %Y)+$years))-$(strftime '%m-%d %T')"
+	strftime -s years -r '%F %T' "$(( $(strftime %Y)+$years ))-$(strftime '%m-%d %T')"
 	print $(( (years-now)/(24*60*60) ))
 }
 
@@ -104,7 +103,7 @@ function MakeServerCertificate
 		-addext 'basicConstraints = CA:FALSE'\
 		-addext 'keyUsage = digitalSignature, keyEncipherment'\
 		-addext 'extendedKeyUsage = serverAuth'
-	
+
 	$openssl x509\
 		-req\
 		-passin 'env:caPassword'\
@@ -117,7 +116,6 @@ function MakeServerCertificate
 		$digest\
 		-copy_extensions copy
 }
-
 
 function MakeClientCertificate
 {
@@ -133,7 +131,7 @@ function MakeClientCertificate
 		-addext 'basicConstraints = CA:FALSE'\
 		-addext 'keyUsage = digitalSignature'\
 		-addext 'extendedKeyUsage = clientAuth'
-	
+
  	$openssl x509\
 		-req\
 		-in ${file[client_csr]}\
@@ -147,39 +145,60 @@ function MakeClientCertificate
 
 function MakeClientConfig
 {
-	config="${file[client_config]}"
-
 	[[ -r ${file[config_template]} ]] || {
 		print "no template file ${file[config_template]}"
 		return 4
 	}
 
-	cat ${file[config_template]}  > $config
-	print                        >> $config
-	print '<ca>'                 >> $config
-	cat ${file[ca_cert]}         >> $config
-	print '</ca>'                >> $config
-	print                        >> $config
-	print '<cert>'               >> $config
-	cat ${file[client_cert]}     >> $config
-	print '</cert>'              >> $config
-	print                        >> $config
-	print '<key>'                >> $config
-	cat ${file[client_key]}      >> $config
-	print '</key>'               >> $config
-	print                        >> $config
-	[[ -z $withoutTLSCrypt ]] && {
-		print '<tls-crypt>'          >> $config
-		cat ${file[tls_crypt]} | grep -v '^#' >> $config
-		print '</tls-crypt>'         >> $config
-	}
+	local -a secrets
+	secrets=(
+		'ca'   'ca_cert'
+		'cert' 'client_cert'
+		'key'  'client_key' )
+	[[ -z $withoutTLSCrypt ]] && secrets+=('tls-crypt' 'tls_crypt')
+
+	integer config
+	exec {config} > ${file[client_config]}
+	>& $config < ${file[config_template]}
+	for k f in $secrets; do
+		>& $config <<< '' <<< "<$k>" < <(grep -v '^#' ${file[$f]}) <<< "</$k>"
+	done
+	exec {config} >&-
+}
+
+function ShowClientSerial
+{
+	print "ibase=16; ${$($openssl x509 -serial -noout -in ${file[client_cert]})##*=}" | bc
+}
+
+function ShowCertExpiration
+{
+	local cert=$1
+	strftime -s now %s
+	strftime -s exp -r '%F %TZ' "${$(openssl x509 -dateopt iso_8601 -enddate -noout -in $cert)##*=}"
+	(( days = (exp-now)/(24*60*60) ))
+	strftime -s date '%F' $exp
+	if (( days > 0 )); then
+		print -n "expires $date (in ${(l:4:)days} days)"
+	else
+		print -n "expired $date ($((-days)) days ago)"
+	fi
+}
+
+function ShowAllCertsExpiration
+{
+	local c
+	for c in $server/*/*-cert.pem; do
+		ShowCertExpiration $c
+		print "\t${${c#*/}%/*}"
+	done
 }
 
 function AddVPN
 {
 	[[ -z $server ]] && print '$server is not specified' && exit 1
 	[[ -d ${server} ]] && print 'VPN aleready exists.' && exit 2
-	
+
 	mkdir ${server} ${server}/ca ${server}/${server}
 	[[ $key =~ '^rsa' ]] && MakeDHParams
 	[[ -z $withoutTLSCrypt ]] && MakeTLSCrypt
@@ -214,7 +233,8 @@ case $action in
 		print "s|server=<server> [c|client=<client> type={template_prefix} y=<years>] $0 {AddClient|AddVPN}"
 		print
 		print "All functions:"
-		print ${(F)${(k)functions}}
+#		print ${(F)${(koi)functions}}
+		print -l ${(koi)functions}
 		;;
 	*)
 		$action
