@@ -12,11 +12,10 @@ A pretty simple tool.
 ```
 s=<vpn_name> ovpn-ca.zsh AddVPN
 ```
-
-A folder `vpn_name` will be created with CA and server files.
-CA private key will be encrypted with a password printed on stdout. Save it in the safe place!
+The `vpn_name` folder will be created with CA and server files.
+CA private key will be encrypted with a password printed to stdout. Save it in a safe place!
 Copy `sample_client_template.ovpn` into `vpn_name/client_template.ovpn` and edit it.
-It's just a head that will be appended with secrets to make a client's `.ovpn` file.
+It's just a head that will be postpended with secrets to make a client's `.ovpn` file.
 
 ```
 s=<vpn_name> c=<client_name> ovpn-ca.zsh AddClient
@@ -42,14 +41,14 @@ c|client=<client>
 
 Default values                   | Description
 -------------------------------- | ---------------------------------
-`y=1`                            | client certificate years validity
-`caYears=10`                     | CA certificate years validity
-`serverYears=10`                 | server certificate years validity
+`y=1`                            | client certificate years of validity
+`caYears=10`                     | CA certificate years of validity
+`serverYears=10`                 | server certificate years of validity
 `key=ed448`                      | other possible values: `ed25519`, `rsa:4096`
 `digest=sha512`                  | for RSA keys
 `withoutTLSCrypt=`               | any non-zero value disables `tls-crypt`
-`pwgen='pwgen -s -c -n -y 32 1'` | a tool that will be executed to generate a password for CA private key
-`subj='/CN=${cn}'`               | template for certificate subject, `${cn}` will be substituted
+`pwgen='pwgen -s -c -n -y 32 1'` | a tool that will be executed to generate a password for the CA private key
+`subj='/CN=${cn}'`               | template for the certificate subject, `${cn}` will be substituted
 `type=`                          | selects `${type}_client_template.ovpn`<br> (for different VPNs (like tun and tap) on the same CA)<br> if omitted `client_template.ovpn` will be used
 
 Subject example:
@@ -67,7 +66,7 @@ and from the server's directory. Any options can be specified there.
 
 ## Expiration
 
-To list all certs expiration date and days left:
+To list all certs expiration dates and days left:
 ```
 s=<server> serShowAllCertsExpiration
 ```
@@ -75,9 +74,9 @@ s=<server> serShowAllCertsExpiration
 
 ## Revocation
 
-Just create a file named as a client's serial number to revoke,
+Just create a file named as the client's serial number to revoke,
 in <crls> directory configured as `crl-verify <crls> dir` on the OpenVPN server.
-The file's content doesn't matter, though client's name is convenient.
+The file's content doesn't matter, though it is convenient to put the client's name there.
 
 Get client's certificate serial number:
 ```
