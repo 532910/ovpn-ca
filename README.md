@@ -12,10 +12,12 @@ A pretty simple tool.
 ```
 s=<vpn_name> ovpn-ca.zsh AddVPN
 ```
+
 The `vpn_name` folder will be created with CA and server files.
 CA private key will be encrypted with a password printed to stdout. Save it in a safe place!
 Copy `sample_client_template.ovpn` into `vpn_name/client_template.ovpn` and edit it.
 It's just a head that will be postpended with secrets to make a client's `.ovpn` file.
+
 
 ```
 s=<vpn_name> c=<client_name> ovpn-ca.zsh AddClient
