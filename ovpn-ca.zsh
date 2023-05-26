@@ -168,6 +168,12 @@ function MakeClientConfig
 
 function ShowClientSerial
 {
+	[[ -z $server || -z $client  ]] && {
+		[[ -z $server ]] && print '$server is not specified'
+		[[ -z $client ]] && print '$client is not specified'
+		exit 1
+	}
+
 	print "ibase=16; ${$($openssl x509 -serial -noout -in ${file[client_cert]})##*=}" | bc
 }
 
@@ -187,6 +193,8 @@ function ShowCertExpiration
 
 function ShowAllCertsExpiration
 {
+	[[ -z $server ]] && print '$server is not specified' && exit 1
+
 	local c
 	for c in $server/*/*-cert.pem; do
 		ShowCertExpiration $c
