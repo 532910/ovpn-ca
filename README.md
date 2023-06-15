@@ -77,7 +77,9 @@ s=<server> ShowAllCertsExpiration
 ## Revocation
 
 Just create a file named as the client's serial number to revoke,
-in <crls> directory configured as `crl-verify <crls> dir` on the OpenVPN server.
+in `<crls>` directory configured as
+[`crl-verify <crls> dir`](https://manpages.debian.org/openvpn#crl)
+on the OpenVPN server.
 The file's content doesn't matter, though it is convenient to put the client's name there.
 
 Get client's certificate serial number:
