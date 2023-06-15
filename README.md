@@ -70,7 +70,7 @@ and from the server's directory. Any options can be specified there.
 
 To list all certs expiration dates and days left:
 ```
-s=<server> serShowAllCertsExpiration
+s=<server> ShowAllCertsExpiration
 ```
 
 
