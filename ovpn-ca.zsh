@@ -185,10 +185,14 @@ function ShowCertExpiration
 	(( days = (exp-now)/(24*60*60) ))
 	strftime -s date '%F' $exp
 	if (( days > 0 )); then
+		(( days < 365 )) && print -nP "%F{143}"
+		(( days < 200 )) && print -nP "%F{203}"
 		print -n "expires $date (in ${(l:4:)days} days)"
 	else
-		print -n "expired $date ($((-days)) days ago)"
+		print -nP "%F{95}"
+		print -n "expired $date (${(l:3:)$((-days))} days ago)"
 	fi
+	print -nP "%f"
 }
 
 function ShowAllCertsExpiration
