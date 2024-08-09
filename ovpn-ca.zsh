@@ -202,7 +202,7 @@ function ShowAllCertsExpiration
 	local c
 	for c in $server/*/*-cert.pem; do
 		ShowCertExpiration $c
-		print "\t${${c#*/}%/*}"
+		print "  ${${c#*/}%/*}"
 	done
 }
 
