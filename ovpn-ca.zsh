@@ -3,13 +3,13 @@
 umask 'u=rwx,g=,o='
 zmodload zsh/datetime
 
+server=${server:-$s}
+client=${client:-$c}
+
 [[ -r config ]] && source config
 [[ -r ${server}/config ]] && source ${server}/config
 
 action=$1
-
-server=${server:-$s}
-client=${client:-$c}
 
 y=${y:-1}
 key=${key:-'ed448'}
