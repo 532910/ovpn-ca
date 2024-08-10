@@ -11,7 +11,7 @@ action=$1
 server=${server:-$s}
 client=${client:-$c}
 
-y=1
+y=${y:-1}
 key=${key:-'ed448'}
 subj=${subj:-'/CN=${cn}'}
 [[ $key =~ '^rsa' ]] && digest=${digest:-'-sha512'}
