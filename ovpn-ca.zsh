@@ -15,7 +15,7 @@ y=${y:-1}
 key=${key:-'ed448'}
 subj=${subj:-'/CN=${cn}'}
 [[ $key =~ '^rsa' ]] && digest=${digest:-'-sha512'}
-pwgen=(pwgen -s -c -n -y 20 1)
+pwgen=(pwgen -s -c -n 32 1)
 caYears=10
 serverYears=10
 openssl='/usr/bin/openssl'
