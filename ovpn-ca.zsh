@@ -182,7 +182,7 @@ function ShowCertExpiration
 	local cert=$1
 	strftime -s now %s
 	strftime -s exp -r '%F %TZ' "${$(openssl x509 -dateopt iso_8601 -enddate -noout -in $cert)##*=}"
-	(( days = (exp-now)/(24*60*60) ))
+	(( days = (exp-now)/(24*60*60) )) || true
 	strftime -s date '%F' $exp
 	if (( days > 0 )); then
 		(( days < 180 )) && print -nP "%F{143}"
